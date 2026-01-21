@@ -1,2 +1,17 @@
-# Smart-AI-News-Aggregator
-Designed an automated news ecosystem using n8n that aggregates live data from RSS Feeds like CNN. Integrated a Google Gemini AI Agent to filter and generate concise summaries, broadcasting highlights directly to Telegram. This tool streamlines information processing through efficient API integration.
+# 📰 Smart AI News Aggregator
+
+A real-time information monitoring system that filters and summarizes news from various global and local sources.
+
+**🌟 Key Features**
+- **Multi-Source Aggregation**: Pulls live data from multiple **RSS Feeds** (e.g., CNN, Detik, Tempo) simultaneously.
+
+- **AI Filtering**: Uses an **AI Agent** to scan news content, filter out noise, and identify relevant trends.
+
+- **Automated Broadcast**: Delivers AI-generated summaries directly to Telegram channels for instant updates.
+
+**🛠 Tech Stack**
+- **Orchestration**: n8n
+
+- **AI Model**: Google Gemini
+
+- **Protocol**: RSS/XML & Telegram Bot API
