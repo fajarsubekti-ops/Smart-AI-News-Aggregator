@@ -1,0 +1,478 @@
+{
+  "name": "Berita",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d19a5b65-1567-4051-8f59-528163a2a818",
+      "name": "When clicking ‘Execute workflow’",
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "chatId": "937790128",
+        "text": "={{ $json.formatted_output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "0cd9cb97-146d-450e-bdcb-ed68af64dd4b",
+      "name": "Send a text message",
+      "webhookId": "91874124-3da7-4ecd-8b61-732357a21258",
+      "credentials": {
+        "telegramApi": {
+          "id": "kO9UiHTfli9yyRT9",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        592,
+        144
+      ],
+      "id": "982dee0a-ad01-404e-ba4d-8defb4e85648",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.formatted_output }}",
+        "options": {
+          "systemMessage": "Kamu adalah seorang Editor Berita Senior. Saya akan memberikan data mentah dari 3 sumber berita berbeda (CNN Indonesia, Detik.com, dan Tempo).\n\nTugas kamu:\n1. Identifikasi topik utama yang dibahas secara serentak oleh ketiga media tersebut.\n2. Buat ringkasan gabungan dalam 3-5 poin penting yang mencakup informasi dari ketiga sumber.\n3. Analisis Perbedaan: Sebutkan jika ada fakta atau angka yang berbeda di antara ketiganya.\n4. Sentimen: Tentukan apakah berita ini cenderung positif, negatif, atau netral.\n5. Hoax: Tentukan apakah berita ini cenderung hoax atau tidak\n\nDATA BERITA:\n{{ JSON.stringify($json.data) }}\n\nFormat Output:\n- Gunakan bahasa Indonesia yang formal namun mudah dimengerti.\n- JANGAN gunakan format Markdown seperti bintang-bintang (**), garis bawah (__), atau karakter khusus lainnya agar data aman dikirim via API.\n- Tuliskan jawaban dalam teks polos saja.\n\nContoh Struktur Jawaban:\nTOPIK UTAMA: [Isi di sini]\nRINGKASAN:\n1. [Poin 1]\n2. [Poin 2]\n\nPERBEDAAN SUMBER: [Sebutkan jika ada, jika tidak tulis 'Konsisten']\n\nSENTIMEN: [Isi di sini]\n\nHOAX : [Isi di sini]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        208
+      ],
+      "id": "859f65c9-8805-4b70-9bf9-8731a295fbcf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        400
+      ],
+      "id": "36107383-58df-4b67-8edb-15950498f217",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VH9WPS3912RbnWVV",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "937790128",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        208
+      ],
+      "id": "aa718845-2df4-4902-9a8e-841d4af66e6c",
+      "name": "Send a text message1",
+      "webhookId": "91874124-3da7-4ecd-8b61-732357a21258",
+      "credentials": {
+        "telegramApi": {
+          "id": "kO9UiHTfli9yyRT9",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.cnnindonesia.com/nasional/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ce6877c9-411a-49b5-b9ff-b7b15dc4a7d8",
+      "name": "RSS CNN"
+    },
+    {
+      "parameters": {
+        "url": "https://news.detik.com/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        160
+      ],
+      "id": "ffa7c4e6-6c31-458b-8b06-27db3f9376f1",
+      "name": "RSS Detik"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.tempo.co/nasional",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        320
+      ],
+      "id": "3faec548-ec61-4a1b-aaf4-a635966cb5e2",
+      "name": "RSS Tempo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Menetapkan batas waktu: 3 hari yang lalu dalam milidetik\nconst cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;\n\n/**\n * Fungsi untuk mengambil waktu dalam milidetik dari berbagai format tanggal RSS\n */\nfunction getDateMs(entry) {\n  const raw = \n    entry.isoDate ?? \n    entry.pubDate ?? \n    entry.published ?? \n    entry.updated ?? \n    entry.date ?? \n    null;\n\n  if (!raw) return NaN;\n  const ms = Date.parse(raw);\n  return Number.isFinite(ms) ? ms : NaN;\n}\n\n// Melakukan filter pada item yang masuk\nconst recentItems = items.filter(i => getDateMs(i.json) > cutoff);\n\n// Logika jika tidak ada berita dalam 3 hari terakhir\nif (recentItems.length === 0) {\n  return [\n    {\n      json: {\n        no_recent_items: true,\n        message: \"No stories from the last 3 days\"\n      }\n    }\n  ];\n}\n\n// Jika ada, kembalikan daftar berita terbaru tersebut\nreturn recentItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "75d984ab-8521-422f-a2ea-ede62ccd3700",
+      "name": "Format 3D CNN"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Menetapkan batas waktu: 3 hari yang lalu dalam milidetik\nconst cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;\n\n/**\n * Fungsi untuk mengambil waktu dalam milidetik dari berbagai format tanggal RSS\n */\nfunction getDateMs(entry) {\n  const raw = \n    entry.isoDate ?? \n    entry.pubDate ?? \n    entry.published ?? \n    entry.updated ?? \n    entry.date ?? \n    null;\n\n  if (!raw) return NaN;\n  const ms = Date.parse(raw);\n  return Number.isFinite(ms) ? ms : NaN;\n}\n\n// Melakukan filter pada item yang masuk\nconst recentItems = items.filter(i => getDateMs(i.json) > cutoff);\n\n// Logika jika tidak ada berita dalam 3 hari terakhir\nif (recentItems.length === 0) {\n  return [\n    {\n      json: {\n        no_recent_items: true,\n        message: \"No stories from the last 3 days\"\n      }\n    }\n  ];\n}\n\n// Jika ada, kembalikan daftar berita terbaru tersebut\nreturn recentItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        160
+      ],
+      "id": "ab3bc321-ff30-415e-9513-4ede8a75d27b",
+      "name": "Format 3D Detik"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Menetapkan batas waktu: 3 hari yang lalu dalam milidetik\nconst cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;\n\n/**\n * Fungsi untuk mengambil waktu dalam milidetik dari berbagai format tanggal RSS\n */\nfunction getDateMs(entry) {\n  const raw = \n    entry.isoDate ?? \n    entry.pubDate ?? \n    entry.published ?? \n    entry.updated ?? \n    entry.date ?? \n    null;\n\n  if (!raw) return NaN;\n  const ms = Date.parse(raw);\n  return Number.isFinite(ms) ? ms : NaN;\n}\n\n// Melakukan filter pada item yang masuk\nconst recentItems = items.filter(i => getDateMs(i.json) > cutoff);\n\n// Logika jika tidak ada berita dalam 3 hari terakhir\nif (recentItems.length === 0) {\n  return [\n    {\n      json: {\n        no_recent_items: true,\n        message: \"No stories from the last 3 days\"\n      }\n    }\n  ];\n}\n\n// Jika ada, kembalikan daftar berita terbaru tersebut\nreturn recentItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        320
+      ],
+      "id": "156ed15b-49bb-49c6-b067-8df75dbc5f5b",
+      "name": "Format 3D Tempo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Menetapkan batas waktu: 3 hari yang lalu\nconst cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;\n\nfunction getDateMs(entry) {\n  const raw = \n    entry.isoDate ?? \n    entry.pubDate ?? \n    entry.published ?? \n    entry.updated ?? \n    entry.date ?? \n    null;\n\n  if (!raw) return NaN;\n  const ms = Date.parse(raw);\n  return Number.isFinite(ms) ? ms : NaN;\n}\n\n// 1. Filter berita dari 3 hari terakhir\n// 2. Filter berita berdasarkan waktu\nlet recentItems = items.filter(i => getDateMs(i.json) > cutoff);\n\n// 3. Urutkan dari yang PALING BARU (Descending)\nrecentItems.sort((a, b) => getDateMs(b.json) - getDateMs(a.json));\n\n// 4. Ambil hanya 5 berita teratas setelah diurutkan\nrecentItems = recentItems.slice(0, 5);\n\n// Logika jika tidak ada berita baru agar workflow tidak berhenti\nif (recentItems.length === 0) {\n  return [\n    {\n      json: {\n        no_recent_items: true,\n        message: \"No stories from the last 3 days\"\n      }\n    }\n  ];\n}\n\nreturn recentItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "af025fcc-f4fd-4028-a802-5c3bf3726530",
+      "name": "Filter 5 New"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Menetapkan batas waktu: 3 hari yang lalu\nconst cutoff = Date.now() - 1 * 24 * 60 * 60 * 1000;\n\nfunction getDateMs(entry) {\n  const raw = \n    entry.isoDate ?? \n    entry.pubDate ?? \n    entry.published ?? \n    entry.updated ?? \n    entry.date ?? \n    null;\n\n  if (!raw) return NaN;\n  const ms = Date.parse(raw);\n  return Number.isFinite(ms) ? ms : NaN;\n}\n\n// 1. Filter berita dari 3 hari terakhir\n// 2. Filter berita berdasarkan waktu\nlet recentItems = items.filter(i => getDateMs(i.json) > cutoff);\n\n// 3. Urutkan dari yang PALING BARU (Descending)\nrecentItems.sort((a, b) => getDateMs(b.json) - getDateMs(a.json));\n\n// 4. Ambil hanya 5 berita teratas setelah diurutkan\nrecentItems = recentItems.slice(0, 250);\n\n// Logika jika tidak ada berita baru agar workflow tidak berhenti\nif (recentItems.length === 0) {\n  return [\n    {\n      json: {\n        no_recent_items: true,\n        message: \"No stories from the last 3 days\"\n      }\n    }\n  ];\n}\n\nreturn recentItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        208
+      ],
+      "id": "7c7b5ce8-e517-4fa0-ae11-74c80de25f98",
+      "name": "Filter 1D New"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Memeriksa apakah node sebelumnya mengirimkan pesan \"tidak ada berita\"\nif (items[0].json.no_recent_items) {\n  return [{\n    json: {\n      formatted_output: \"🤖 **Daily AI**\\n\\nTidak ada berita baru dalam 3 hari terakhir.\"\n    }\n  }];\n}\n\n// Mulai menyusun teks output dengan header\nlet outputText = \"🤖 **Daily AI**\\n\\n\";\n\n// Melakukan iterasi untuk setiap berita dan memformatnya\nitems.forEach((item, index) => {\n  const title = item.json.title || \"No Title\";\n  const link = item.json.link || \"No URL\";\n  \n  // Mengambil tanggal publikasi dari RSS\n  const pubDate = item.json.pubDate || \"Unknown Date\";\n\n  // Menyusun format sesuai permintaan: 1. Headline (Date) - URL\n  outputText += `${index + 1}. ${title} (${pubDate})\\n`;\n  outputText += `- ${link}\\n\\n`;\n});\n\n// Mengembalikan hasil akhir dalam satu properti teks\nreturn [{\n  json: {\n    formatted_output: outputText.trim()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        0
+      ],
+      "id": "f3b554fa-0544-4a06-9c96-bf80a21bbe43",
+      "name": "Build"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Memeriksa apakah node sebelumnya mengirimkan pesan \"tidak ada berita\"\nif (items[0].json.no_recent_items) {\n  return [{\n    json: {\n      formatted_output: \"🤖 **Daily AI**\\n\\nTidak ada berita baru dalam 3 hari terakhir.\"\n    }\n  }];\n}\n\n// Mulai menyusun teks output dengan header\nlet outputText = \"🤖 **Daily AI**\\n\\n\";\n\n// Melakukan iterasi untuk setiap berita dan memformatnya\nitems.forEach((item, index) => {\n  const title = item.json.title || \"No Title\";\n  const link = item.json.link || \"No URL\";\n  \n  // Mengambil tanggal publikasi dari RSS\n  const pubDate = item.json.pubDate || \"Unknown Date\";\n\n  // Menyusun format sesuai permintaan: 1. Headline (Date) - URL\n  outputText += `${index + 1}. ${title} (${pubDate})\\n`;\n  outputText += `- ${link}\\n\\n`;\n});\n\n// Mengembalikan hasil akhir dalam satu properti teks\nreturn [{\n  json: {\n    formatted_output: outputText.trim()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        208
+      ],
+      "id": "060d64b5-ea95-483a-a7d9-80993b706df5",
+      "name": "Build AI"
+    },
+    {
+      "parameters": {
+        "content": "## Sumber Berita",
+        "height": 512,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -48
+      ],
+      "id": "859db7fb-e31d-40ad-8919-abafc2b3d2c1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 5 Berita Terbaru",
+        "height": 192,
+        "width": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "80f43646-c44e-483d-a187-ea8ae7b5e9e6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Analisis Berita Terbaru",
+        "height": 384,
+        "width": 896,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        752,
+        160
+      ],
+      "id": "50b7692d-d23f-4f2a-aa49-b279a991f79f",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS CNN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Detik",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Tempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter 5 New",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter 1D New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS CNN": {
+      "main": [
+        [
+          {
+            "node": "Format 3D CNN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Detik": {
+      "main": [
+        [
+          {
+            "node": "Format 3D Detik",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Tempo": {
+      "main": [
+        [
+          {
+            "node": "Format 3D Tempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format 3D CNN": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format 3D Detik": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Format 3D Tempo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Filter 5 New": {
+      "main": [
+        [
+          {
+            "node": "Build",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter 1D New": {
+      "main": [
+        [
+          {
+            "node": "Build AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "90b88386-21ea-4379-8d69-f8a555fa1970",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc8a6ae6898cc39a21e50c20591c5b47b60208d2ef9545ac944c96b94750dbc7"
+  },
+  "id": "DK0FEOoDAdOYZKvA",
+  "tags": []
+}
